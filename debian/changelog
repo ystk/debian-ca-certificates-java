@@ -1,3 +1,168 @@
+ca-certificates-java (20121112+nmu2) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * postinst, jks-keystore.hook: Do not fail if nss.cfg does not (yet) exist,
+    i.e. if openjdk-?-jre-headless is unpacked but not yet configured.
+    (Closes: #694888)
+  * Set urgency to medium for RC bugfix.
+
+ -- Andreas Beckmann <anbe@debian.org>  Sun, 27 Jan 2013 14:19:41 +0100
+
+ca-certificates-java (20121112+nmu1) unstable; urgency=low
+
+  * Non-maintainer upload
+  * Fix test for dpkg-query in postinst; there was an extraneous --version
+    here. [Probably don't even need to bother to check for dpkg-query, but
+    why not.] (Closes: #690204)
+  * Library path for softokn3pkg and nsspkg is potentially wrong if there
+    are multiple different paths; fix it.
+  * Do not run the hook if ca-certificates-java has been removed but not
+    purged.
+  * Use the new trigger support provided by ca-certificates (>=20121114).
+
+ -- Don Armstrong <don@debian.org>  Mon, 12 Nov 2012 15:45:50 -0800
+
+ca-certificates-java (20120721) unstable; urgency=low
+
+  * Fix jks-keystore and postinst to work on multi-arch system.
+    Use dpkg-query -L package:arch. (Closes: #680618).
+  * As libnss3-1d is a transitional package on both Debian and Ubuntu,
+    upgrade Depends to use libnss3.
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Sat, 21 Jul 2012 01:06:32 +0200
+
+ca-certificates-java (20120608) unstable; urgency=low
+
+  [ James Page ]
+  * Switch primary JRE dependency from openjdk-6 to openjdk-7 to support
+    demotion of openjdk-6 to universe in Ubuntu:
+    - d/control, rules: Generate primary JRE dependency at build time to
+      allow differentiation between Ubuntu and Debian.
+  * Added myself to uploaders.
+
+  [ Damien Raude-Morvan ]
+  * Update to unstable.
+  * Set DMUA flag for James Page.
+
+ -- James Page <james.page@ubuntu.com>  Fri, 08 Jun 2012 09:44:58 +0100
+
+ca-certificates-java (20120603) unstable; urgency=low
+
+  * Use javahelper as buildsystem:
+    - d/control: Add Build-Depends on javahelper.
+    - d/rules: Use jh_build to call javac.
+  * Create a testsuite for this package:
+    - Refactor UpdateCertificates code to send exceptions instead of
+      System.exit(1).
+    - New testsuite: UpdateCertificatesTest.
+    - d/control: Build-Depends on junit4.
+    - d/rules: Launch junit after build and handle "nocheck" option in
+      DEB_BUILD_OPTIONS.
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Sun, 03 Jun 2012 12:10:26 +0200
+
+ca-certificates-java (20120524) unstable; urgency=low
+
+  [ Marc Deslauriers ]
+  * debian/preinst, debian/postinst: remove the 20110912ubuntu1 work-around
+    since it is no longer needed.
+  * debian/postinst: don't put a symlink in / if jvm doesn't contain nss
+    configuration. (Closes: #665754, #665749).
+  * debian/postinst: force migration to new alias names again. The
+    migration was supposed to occur on upgrades to Oneiric, but failed
+    because of an NSS error.
+  * debian/postinst: forcibly remove diginotar cert. It could be left
+    behind under certain circumstances. (LP: #920758)
+  * debian/postinst: also look for jvm in multiarch locations (LP: #962378)
+  * debian/postinst: retrigger first_install to properly get cert store.
+
+  [ James Page ]
+  * d/rules: Ensure java is built with source/target == 1.6 for backwards
+    compatibility with openjdk-6. 
+
+  [ Damien Raude-Morvan ]
+  * Sync handling of nss.cfg between debian/jks-keystore.hook.in and
+    debian/postinst.in.
+  * Merge changes from Ubuntu (Thanks to James Page and Marc Deslauriers).
+  * Improve handling of certificate with UTF-8 filenames:
+    - UpdateCertificates: Force read System.in with UTF-8
+    - debian/postinst: Set LC_CTYPE to C.UTF-8
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Tue, 22 May 2012 23:41:41 +0200
+
+ca-certificates-java (20120225) unstable; urgency=low
+
+  [ Steve Langasek ]
+  * debian/jks-keystore.hook: If we *don't* find libnss3 / libnss3-1d,
+    don't remove files from the filesystem in do_cleanup(),
+    since this has a nasty tendency of nuking system libraries.
+    LP: #855171.
+  * debian/preinst, debian/postinst: when upgrading from version
+    20110912ubuntu1, disable the buggy hook script early to prevent it from
+    being run before our new version is configured; and re-enable the script
+    in the postinst.  LP: #855246.
+
+  [ Matthias Klose ]
+  * Mark as Multi-Arch: foreign.
+  * Adjust the libnss3-1d versioned dependency.
+
+  [ Damien Raude-Morvan ]
+  * Add myself to Uploaders.
+  * Use dh_gencontrol and dpkg-vendor to allow:
+    - New substvar ${nss:Depends} for libnss3-1d versionning.
+    - New @NSS_LIB@ parameter for debian/*.in files.
+  * Bump Standards-Version to 3.9.3:
+    - Add recommended build-arch / build-indep targets.
+
+ -- Damien Raude-Morvan <drazzib@debian.org>  Sat, 25 Feb 2012 15:06:32 +0100
+
+ca-certificates-java (20111223) unstable; urgency=low
+
+  * Support new multiarch JRE packages in postinst.
+
+ -- Torsten Werner <twerner@debian.org>  Fri, 23 Dec 2011 13:46:15 +0100
+
+ca-certificates-java (20110912) unstable; urgency=low
+
+  * Support new multiarch JRE packages in jks-keystore. (Closes: #641306)
+  * Support OpenJDK 7. (Closes: #641305)
+
+ -- Torsten Werner <twerner@debian.org>  Mon, 12 Sep 2011 21:23:22 +0200
+
+ca-certificates-java (20110816) unstable; urgency=low
+
+  * Upgrade Recommends: libnss3-1d to a versioned Depends due to multiarch
+    changes. (Closes: #635571)
+  * Use the locale C.UTF-8 for the hook script to be more robust.
+
+ -- Torsten Werner <twerner@debian.org>  Tue, 16 Aug 2011 11:00:33 +0200
+
+ca-certificates-java (20110531) unstable; urgency=low
+
+  * Prepare for multiarch libnss3 update.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 31 May 2011 15:20:52 +0200
+
+ca-certificates-java (20110426) unstable; urgency=low
+
+  * Test for existing file in postinst before copying it. (Closes: #624152)
+  * Add Vcs headers to debian/control.
+
+ -- Torsten Werner <twerner@debian.org>  Tue, 26 Apr 2011 09:23:03 +0200
+
+ca-certificates-java (20110425) unstable; urgency=low
+
+  * Add Java code to update the keystore and support UTF-8 encoded filenames.
+    (Closes: #607245, #623671)
+  * Change Maintainer to Debian Java Maintainers and add myself to Uploaders.
+  * Update Build-Depends.
+  * Replace old inconsistent keystore aliases. (Closes: #623888)
+  * Add support for openjdk-7 and remove support for old cacao VM.
+  * Add a NEWS file explaining the update.
+  * Update README.Debian.
+
+ -- Torsten Werner <twerner@debian.org>  Mon, 25 Apr 2011 15:28:55 +0200
+
 ca-certificates-java (20100412) unstable; urgency=low
 
   * Upload to unstable.

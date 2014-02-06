@@ -4,65 +4,69 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+ifeq ($(shell dpkg-vendor --derives-from Ubuntu && echo yes),yes)
+	SUBSTVARS = -Vnss:Depends="libnss3 (>= 3.12.9+ckbi-1.82-0ubuntu3~)" \
+				-Vjre:Depends="openjdk-7-jre-headless (>= 7~u3-2.1.1~pre1-1)"
+	nss_lib = libnss3
+else
+	SUBSTVARS = -Vnss:Depends="libnss3 (>= 3.12.10-2~)" \
+				-Vjre:Depends="openjdk-6-jre-headless (>= 6b16-1.6.1-2)"
+	nss_lib = libnss3
+endif
+
+JAVA_HOME := /usr/lib/jvm/default-java
+export JAVA_HOME
+OPTS := --no-javadoc --main=UpdateCertificates --javacopts="-source 1.6 -target 1.6"
+CLASSPATH := /usr/share/java/junit4.jar
+export CLASSPATH
+
+do_junit = $(if $(findstring nocheck,$(DEB_BUILD_OPTIONS)),,yes)
+
 d = debian/ca-certificates-java
 
+build-arch: build
+build-indep: build
 build: build-stamp
 build-stamp:
 	dh_testdir
-	rm -rf build
-	mkdir -p build
-	set -e; \
-	yes | \
-	for crt in $$(find /usr/share/ca-certificates -name '*.crt' -printf '%P '); do \
-	  alias=$$(basename $$crt .crt | tr A-Z a-z | tr -cs a-z0-9 _); \
-	  alias=$${alias%*_}; \
-	  echo "IMPORT: $$crt, alias=$$alias"; \
-	  if keytool -importcert -trustcacerts -keystore build/cacerts \
-	    -storepass 'changeit' \
-	    -alias "$$alias" -file "/usr/share/ca-certificates/$$crt" > keytool.log 2>&1; \
-	  then \
-	    cat keytool.log; \
-	  elif keytool -importcert -trustcacerts -keystore build/cacerts \
-	    -providerClass sun.security.pkcs11.SunPKCS11 \
-	    -providerArg '$${java.home}/lib/security/nss.cfg' \
-	    -storepass 'changeit' \
-	    -alias "$$alias" -file "/usr/share/ca-certificates/$$crt" > keytool.log 2>&1; \
-	  then \
-	    cat keytool.log; \
-	  elif grep -q 'Signature not available' keytool.log; then \
-	    echo "IGNORED IMPORT: $$crt, alias=$$alias"; \
-	    cat keytool.log; \
-	  else \
-	    cat keytool.log; \
-	    false; \
-	  fi; \
-	done
+	jh_build $(OPTS) ca-certificates-java.jar .
+ifeq ($(do_junit),yes)
+	$(JAVA_HOME)/bin/java -cp /usr/share/java/junit4.jar:./ca-certificates-java.jar \
+	org.junit.runner.JUnitCore \
+	UpdateCertificatesTest
+endif
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
-	rm -rf build
-	rm -f keytool.log
-	dh_clean 
+	jh_build --clean
+	$(RM) build-stamp
+	dh_clean
+	for f in debian/*.in; do \
+	  f2=$$(echo $$f | sed ';s/\.in$$//'); \
+	  rm -f $$f2; \
+	done
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k 
+	dh_prep
 	dh_installdirs \
 		usr/share/ca-certificates-java \
 		etc/default \
 		etc/ssl/certs/java \
-		etc/ca-certificates/update.d \
-
+		etc/ca-certificates/update.d
+	for f in debian/*.in; do \
+	  f2=$$(echo $$f | sed 's/\.in$$//'); \
+	  sed -e 's/@NSS_LIB@/$(nss_lib)/g' \
+	    $$f > $$f2; \
+	done
 	install -m755 debian/jks-keystore.hook \
 		$(d)/etc/ca-certificates/update.d/jks-keystore
-	install -m644 build/cacerts \
-		$(d)/usr/share/ca-certificates-java/
 	install -m600 debian/default \
 		$(d)/etc/default/cacerts
+	dh_install ca-certificates-java.jar /usr/share/ca-certificates-java/
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -73,7 +77,7 @@ binary-indep: build install
 	dh_compress
 	dh_fixperms
 	dh_installdeb
-	dh_gencontrol
+	dh_gencontrol -- $(SUBSTVARS)
 	dh_md5sums
 	dh_builddeb
 
