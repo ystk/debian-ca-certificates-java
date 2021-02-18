@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 
 /**
  * @author Emmanuel Bourg
- * @version $Revision: 17927 $, $Date: 2014-03-24 05:32:19 -0700 (Mon, 24 Mar 2014) $
+ * @version $Revision$, $Date$
  */
 public class KeyStoreHandlerTest {
 

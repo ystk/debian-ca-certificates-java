@@ -1,3 +1,78 @@
+ca-certificates-java (20170929~deb8u1) jessie-lts; urgency=medium
+
+  * Backport to jessie for openjdk-8.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Tue, 18 Aug 2020 22:03:49 +0200
+
+ca-certificates-java (20170929~deb9u3) stretch; urgency=medium
+
+  * Team upload.
+  * Fix printf syntax problem introduced in 20170929~deb9u2
+
+ -- tony mancill <tmancill@debian.org>  Wed, 10 Apr 2019 19:59:01 -0700
+
+ca-certificates-java (20170929~deb9u2) stretch; urgency=medium
+
+  * Team upload.
+  * Address bashisms in postinst and jks-keystore (Closes: #922720)
+
+ -- tony mancill <tmancill@debian.org>  Sun, 24 Feb 2019 09:55:04 -0800
+
+ca-certificates-java (20170929~deb9u1) stretch; urgency=medium
+
+  * Rebuild for stretch.
+
+ -- Andreas Beckmann <anbe@debian.org>  Mon, 11 Feb 2019 13:14:23 +0100
+
+ca-certificates-java (20170929) unstable; urgency=low
+
+  [ Gianfranco Costamagna ]
+  * Team upload.
+  * Ack previous NMU, thanks
+
+  [ Rico Tzschichholz ]
+  * Fix temporary jvm-*.cfg generation on armhf (Closes: #874276)
+    - the armhf installation path is different from other architectures.
+
+ -- Rico Tzschichholz <ricotz@ubuntu.com>  Wed, 27 Sep 2017 17:17:59 +0200
+
+ca-certificates-java (20170531+nmu1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Revert to depending on openjdk-7 instead of openjdk-8, since this triggers
+    a failure to dist-upgrade, due to the triggers loop (See: #864597). The
+    openjdk-7 package was dropped from stretch, but the java7-runtime-headless
+    alternative dependency is satisfied by openjdk-8.
+
+ -- Cyril Brulebois <kibi@debian.org>  Thu, 15 Jun 2017 17:33:00 +0200
+
+ca-certificates-java (20170531) unstable; urgency=medium
+
+  * Team upload.
+  * Depend on openjdk-8 instead of openjdk-7 (Closes: #863803)
+  * Moved the package to Git
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Wed, 31 May 2017 15:02:23 +0200
+
+ca-certificates-java (20161107) unstable; urgency=medium
+
+  * Team upload.
+  * postinst: Use exit trap instead of if condition to not fail silently
+    (e.g. in case the java binary is not found) (Closes: #822201)
+  * Bump Standards-Version to 3.9.8 (no changes)
+
+ -- Benjamin Drung <benjamin.drung@profitbricks.com>  Mon, 07 Nov 2016 13:45:23 +0100
+
+ca-certificates-java (20160321) unstable; urgency=medium
+
+  * Team upload.
+  * Drop support for obsolete Java 6 (Closes: #776897)
+  * Add support for Java 8 and 9 (Closes: #775775)
+  * Bump Standards-Version to 3.9.7 (no changes)
+  * Use secure HTTPS URI for Vcs-Browser
+
+ -- Benjamin Drung <benjamin.drung@profitbricks.com>  Mon, 21 Mar 2016 14:34:49 +0100
+
 ca-certificates-java (20140324) unstable; urgency=medium
 
   * Team upload.
